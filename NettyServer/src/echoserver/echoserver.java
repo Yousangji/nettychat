@@ -1,5 +1,7 @@
 package echoserver;
 
+import java.util.logging.SocketHandler;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -16,6 +18,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.CharsetUtil;
 
 public class echoserver {
@@ -49,8 +52,13 @@ public class echoserver {
                             if(sslContext != null){
                                 p.addLast(sslContext.newHandler(ch.alloc()));
                             }
+                           
+                            p.addLast("pong",new IdleStateHandler(60, 60, 30));
                             p.addLast(new echoserverhandler());
                             p.addLast(new StringDecoder(CharsetUtil.UTF_8), new StringEncoder(CharsetUtil.UTF_8));
+
+                           
+                          
                         }
                     })
                     .childOption(ChannelOption.SO_KEEPALIVE,true);
